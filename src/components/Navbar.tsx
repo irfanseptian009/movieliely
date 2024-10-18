@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Cookies from "js-cookie";
+
 const Navbar = () => {
   const handleLogout = () => {
-    Cookies.remove("userId");
-    window.location.href = "/login";
+    Cookies.remove("userId"); // Hapus userId dari cookie saat logout
+    window.location.href = "/login"; // Redirect ke halaman login
   };
 
   return (
