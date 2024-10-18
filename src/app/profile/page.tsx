@@ -1,28 +1,48 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/redux/store";
-import { removeFavorite } from "@/redux/slice";
+import { useEffect, useState } from "react";
+
+interface Movie {
+  id: string;
+  title: string;
+  imageUrl: string;
+}
 
 const ProfilePage = () => {
-  const favorites = useSelector((state: RootState) => state.favorite.movies);
-  const dispatch = useDispatch();
+  const [favorites, setFavorites] = useState<Movie[]>([]);
 
-  const handleRemoveFavorite = async (movieId: string) => {
-    try {
-      const res = await fetch("/api/favorite", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ movieId }),
-      });
+  useEffect(() => {
+    // Ambil userId dari localStorage
+    const userId = localStorage.getItem("userId");
 
-      if (res.ok) {
-        dispatch(removeFavorite(movieId));
-      }
-    } catch (error) {
-      console.error("Error removing favorite movie", error);
+    // Jika userId valid, fetch daftar favorit
+    if (userId) {
+      fetch(`/api/favorite?userId=${userId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFavorites(data);
+        })
+        .catch((err) => console.error("Error fetching favorite movies:", err));
+    }
+  }, []);
+
+  // Fungsi untuk menghapus film dari favorit
+  const handleDeleteFavorite = async (movieId: string) => {
+    const response = await fetch("/api/favorite", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ movieId }),
+    });
+
+    if (response.ok) {
+      // Update daftar favorit di state setelah berhasil dihapus
+      setFavorites((prevFavorites) =>
+        prevFavorites.filter((movie) => movie.id !== movieId)
+      );
+    } else {
+      console.error("Failed to delete movie");
     }
   };
 
@@ -31,14 +51,14 @@ const ProfilePage = () => {
       <h1>Your Favorite Movies</h1>
       <div className="grid grid-cols-3 gap-4">
         {favorites.map((movie) => (
-          <div key={movie.id} className="border p-4">
+          <div key={movie.id}>
             <img src={movie.imageUrl} alt={movie.title} />
             <h2>{movie.title}</h2>
             <button
-              onClick={() => handleRemoveFavorite(movie.id)}
-              className="bg-red-500 text-white px-2 py-1 mt-2"
+              onClick={() => handleDeleteFavorite(movie.id)}
+              className="bg-red-500 text-white p-2 mt-2"
             >
-              Remove from Favorite
+              Delete Favorite
             </button>
           </div>
         ))}

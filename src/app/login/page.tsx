@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter(); // Ini sekarang dari 'next/navigation'
+  const router = useRouter();
 
   const handleLogin = async () => {
     const res = await fetch("/api/auth/login", {
@@ -19,8 +20,8 @@ const LoginPage = () => {
 
     if (res.ok) {
       const data = await res.json();
-      // Simpan userId ke session atau local storage
-      localStorage.setItem("userId", data.userId);
+      // Simpan userId di cookie
+      Cookies.set("userId", data.userId);
       router.push("/movie");
     } else {
       console.error("Login failed");
