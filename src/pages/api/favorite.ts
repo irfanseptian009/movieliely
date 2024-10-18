@@ -12,11 +12,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+      // Pastikan film favorit tersimpan untuk user yang spesifik
       const savedMovie = await prisma.movie.create({
         data: {
           title: movie.title,
           imageUrl: movie.imageUrl,
-          user: { connect: { id: userId } },
+          userId, // Kaitkan dengan userId dari pengguna yang login
         },
       });
       res.status(200).json(savedMovie);
@@ -25,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: "Failed to save favorite movie" });
     }
   } else if (method === "GET") {
-    // Mengambil daftar favorit
     const { userId } = req.query;
 
     if (!userId) {
@@ -33,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+      // Ambil daftar favorit hanya untuk pengguna yang login
       const favoriteMovies = await prisma.movie.findMany({
         where: { userId: userId as string },
       });

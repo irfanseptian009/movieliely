@@ -11,13 +11,13 @@ model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
-  favorites Movie[]
+  favorites Movie[]  // Relasi ke Movie (banyak film favorit)
 }
 
 model Movie {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   imageUrl  String
-  userId    String   @db.ObjectId
+  userId    String   @db.ObjectId  // Relasi ke User
   user      User     @relation(fields: [userId], references: [id])
 }

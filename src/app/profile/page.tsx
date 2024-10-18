@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import Cookies from "js-cookie";
 
 interface Movie {
   id: string;
@@ -12,10 +14,8 @@ const ProfilePage = () => {
   const [favorites, setFavorites] = useState<Movie[]>([]);
 
   useEffect(() => {
-    // Ambil userId dari localStorage
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId"); // Ambil userId dari cookie
 
-    // Jika userId valid, fetch daftar favorit
     if (userId) {
       fetch(`/api/favorite?userId=${userId}`)
         .then((res) => res.json())
@@ -26,7 +26,6 @@ const ProfilePage = () => {
     }
   }, []);
 
-  // Fungsi untuk menghapus film dari favorit
   const handleDeleteFavorite = async (movieId: string) => {
     const response = await fetch("/api/favorite", {
       method: "DELETE",
@@ -37,7 +36,6 @@ const ProfilePage = () => {
     });
 
     if (response.ok) {
-      // Update daftar favorit di state setelah berhasil dihapus
       setFavorites((prevFavorites) =>
         prevFavorites.filter((movie) => movie.id !== movieId)
       );
@@ -47,21 +45,24 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="container mx-auto">
-      <h1>Your Favorite Movies</h1>
-      <div className="grid grid-cols-3 gap-4">
-        {favorites.map((movie) => (
-          <div key={movie.id}>
-            <img src={movie.imageUrl} alt={movie.title} />
-            <h2>{movie.title}</h2>
-            <button
-              onClick={() => handleDeleteFavorite(movie.id)}
-              className="bg-red-500 text-white p-2 mt-2"
-            >
-              Delete Favorite
-            </button>
-          </div>
-        ))}
+    <div>
+      <Navbar />
+      <div className="container mx-auto">
+        <h1>Your Favorite Movies</h1>
+        <div className="grid grid-cols-3 gap-4">
+          {favorites.map((movie) => (
+            <div key={movie.id}>
+              <img src={movie.imageUrl} alt={movie.title} />
+              <h2>{movie.title}</h2>
+              <button
+                onClick={() => handleDeleteFavorite(movie.id)}
+                className="bg-red-500 text-white p-2 mt-2"
+              >
+                Delete Favorite
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
