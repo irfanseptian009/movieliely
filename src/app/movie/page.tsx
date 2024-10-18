@@ -1,17 +1,21 @@
 "use client";
 
+import Navbar from "@/components/Navbar";
+import { addFavorite } from "@/redux/slice";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { addFavorite } from "@/redux/slice";
-import Navbar from "@/components/Navbar";
-import Cookies from "js-cookie";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import Image from "next/image";
+import Link from "next/link";
 
 const MoviePage = () => {
   const [movies, setMovies] = useState([]);
   const [nowPlaying, setNowPlaying] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // State untuk input pencarian
-  const [page, setPage] = useState(1); // State untuk halaman saat ini
-  const [totalPages, setTotalPages] = useState(1); // State untuk total halaman dari API
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,16 +33,20 @@ const MoviePage = () => {
         `https://api.themoviedb.org/3/movie/now_playing?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=1`
       );
       const data = await res.json();
-      setNowPlaying(data.results);
+      setNowPlaying(data.results); // Simpan film Now Playing
     };
 
     fetchMovies();
     fetchNowPlaying();
   }, [page]); // Setiap kali halaman berubah, ambil film untuk halaman tersebut
 
-  const handleAddFavorite = async (movie: any) => {
+  const handleAddFavorite = async (movie: {
+    id: number;
+    title: string;
+    poster_path: string;
+  }) => {
     const newFavorite = {
-      id: movie.id,
+      id: movie.id.toString(),
       title: movie.title,
       imageUrl: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
     };
@@ -54,7 +62,7 @@ const MoviePage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId, // Kirim userId yang valid untuk kaitkan dengan pengguna
+          userId,
           movie: newFavorite,
         }),
       });
@@ -65,6 +73,44 @@ const MoviePage = () => {
       }
     } else {
       console.error("User not logged in");
+    }
+  }; // Fungsi untuk menambahkan film ke watchlist
+  const handleAddToWatchlist = async (movie: {
+    id: number;
+    title: string;
+    poster_path: string;
+  }) => {
+    const userId = Cookies.get("userId");
+
+    const newWatchlistItem = {
+      id: movie.id.toString(), // Konversi movieId ke String
+      title: movie.title,
+      imageUrl: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    };
+
+    if (userId) {
+      try {
+        const response = await fetch("/api/watchlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            movie: newWatchlistItem,
+          }),
+        });
+
+        if (response.ok) {
+          console.log("Movie added to watchlist");
+          // Optionally, you can refetch or update the watchlist state here
+        } else {
+          const data = await response.json();
+          console.error("Failed to add movie to watchlist:", data);
+        }
+      } catch (error) {
+        console.error("Error adding movie to watchlist:", error);
+      }
     }
   };
 
@@ -77,7 +123,7 @@ const MoviePage = () => {
       );
       const data = await res.json();
       setMovies(data.results);
-      setTotalPages(data.total_pages); // Update total halaman untuk daftar populer
+      setTotalPages(data.total_pages);
       return;
     }
 
@@ -87,21 +133,7 @@ const MoviePage = () => {
     );
     const data = await res.json();
     setMovies(data.results);
-    setTotalPages(data.total_pages); // Update total halaman untuk hasil pencarian
-  };
-
-  // Fungsi untuk memuat halaman berikutnya
-  const handleNextPage = () => {
-    if (page < totalPages) {
-      setPage(page + 1); // Ubah state halaman ke halaman berikutnya
-    }
-  };
-
-  // Fungsi untuk memuat halaman sebelumnya
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1); // Ubah state halaman ke halaman sebelumnya
-    }
+    setTotalPages(data.total_pages);
   };
 
   return (
@@ -109,24 +141,42 @@ const MoviePage = () => {
       <Navbar />
       <div className="container mx-auto">
         <h1 className="text-xl font-bold">Now Playing</h1>
-        <div className="grid grid-cols-3 gap-4">
-          {nowPlaying.slice(0, 6).map((movie) => (
-            <div key={movie.id}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-              />
-              <h2>{movie.title}</h2>
-              <button
-                onClick={() => handleAddFavorite(movie)}
-                className="bg-blue-500 text-white p-2 mt-2"
-              >
-                Add to Favorite
-              </button>
-            </div>
-          ))}
-        </div>
 
+        {/* Carousel untuk Now Playing menggunakan Swiper.js */}
+        <Swiper spaceBetween={50} slidesPerView={3} grabCursor>
+          {nowPlaying.map((movie: any) => (
+            <SwiperSlide key={movie.id}>
+              <div className="w-full">
+                <Link href={`/movie/${movie.id}`}>
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    alt={movie.title}
+                    width={500}
+                    height={750}
+                    className="rounded-lg"
+                  />
+                </Link>
+                <Link href={`/movie/${movie.id}`}>
+                  <h2 className="mt-2 text-center">{movie.title}</h2>
+                </Link>
+                <button
+                  onClick={() => handleAddFavorite(movie)}
+                  className="bg-blue-500 text-white p-2 mt-2 w-full"
+                >
+                  Add to Favorite
+                </button>
+                <button
+                  onClick={() => handleAddToWatchlist(movie)}
+                  className="bg-yellow-500 text-white p-2 mt-2 w-full"
+                >
+                  Add to Watchlist
+                </button>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {/* Pencarian */}
         <div className="mt-8">
           <h1 className="text-xl font-bold">Search Movies</h1>
           <input
@@ -141,50 +191,32 @@ const MoviePage = () => {
           </button>
         </div>
 
+        {/* Hasil Pencarian */}
         <h1 className="text-xl font-bold mt-8">Movie Results</h1>
         <div className="grid grid-cols-3 gap-4">
-          {movies.map((movie) => (
+          {movies.map((movie: Movie) => (
             <div key={movie.id}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-              />
-              <h2>{movie.title}</h2>
+              <Link href={`/movie/${movie.id}`}>
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  width={500}
+                  height={750}
+                  className="rounded-lg"
+                />
+              </Link>
+              <Link href={`/movie/${movie.id}`}>
+                <h2 className="mt-2 text-center">{movie.title}</h2>
+              </Link>
               <button
                 onClick={() => handleAddFavorite(movie)}
-                className="bg-blue-500 text-white p-2 mt-2"
+                className="bg-blue-500 text-white p-2 mt-2 w-full"
               >
                 Add to Favorite
               </button>
             </div>
-          ))}
+          ))}{" "}
         </div>
-
-        {/* Tombol Pagination */}
-        <div className="flex justify-center space-x-4 mt-8">
-          <button
-            onClick={handlePreviousPage}
-            disabled={page === 1}
-            className={`bg-gray-500 text-white p-2 rounded ${
-              page === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Previous
-          </button>
-          <button
-            onClick={handleNextPage}
-            disabled={page === totalPages}
-            className={`bg-gray-500 text-white p-2 rounded ${
-              page === totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Next
-          </button>
-        </div>
-
-        <p className="text-center mt-4">
-          Page {page} of {totalPages}
-        </p>
       </div>
     </div>
   );

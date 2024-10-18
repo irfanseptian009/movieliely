@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Cookies from "js-cookie";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+// Import Link dari Next.js
 
 interface Movie {
   id: string;
@@ -52,11 +56,21 @@ const ProfilePage = () => {
         <div className="grid grid-cols-3 gap-4">
           {favorites.map((movie) => (
             <div key={movie.id}>
-              <img src={movie.imageUrl} alt={movie.title} />
-              <h2>{movie.title}</h2>
+              <Link href={`/movie/${movie.id}`}>
+                <Image
+                  src={movie.imageUrl}
+                  alt={movie.title}
+                  width={500}
+                  height={750}
+                  className="rounded-lg"
+                />
+              </Link>
+              <Link href={`/movie/${movie.id}`}>
+                <h2 className="text-center mt-2">{movie.title}</h2>
+              </Link>
               <button
                 onClick={() => handleDeleteFavorite(movie.id)}
-                className="bg-red-500 text-white p-2 mt-2"
+                className="bg-red-500 text-white p-2 mt-2 w-full"
               >
                 Delete Favorite
               </button>
