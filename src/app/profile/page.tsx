@@ -6,12 +6,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// Import Link dari Next.js
-
 interface Movie {
   id: string;
   title: string;
   imageUrl: string;
+  overview: string;
+  release_date: string;
+  rating: number;
+  genres: string[];
 }
 
 const ProfilePage = () => {
@@ -51,31 +53,51 @@ const ProfilePage = () => {
   return (
     <div>
       <Navbar />
-      <div className="container mx-auto">
-        <h1>Your Favorite Movies</h1>
-        <div className="grid grid-cols-3 gap-4">
-          {favorites.map((movie) => (
-            <div key={movie.id}>
-              <Link href={`/movie/${movie.id}`}>
-                <Image
-                  src={movie.imageUrl}
-                  alt={movie.title}
-                  width={500}
-                  height={750}
-                  className="rounded-lg"
-                />
-              </Link>
-              <Link href={`/movie/${movie.id}`}>
-                <h2 className="text-center mt-2">{movie.title}</h2>
-              </Link>
-              <button
-                onClick={() => handleDeleteFavorite(movie.id)}
-                className="bg-red-500 text-white p-2 mt-2 w-full"
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-8 text-center">Your Favorite Movies</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {favorites.length > 0 ? (
+            favorites.map((movie) => (
+              <div
+                key={movie.id}
+                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
-                Delete Favorite
-              </button>
-            </div>
-          ))}
+                <Link href={`/movie/${movie.id}`}>
+                  <Image
+                    src={movie.imageUrl}
+                    alt={movie.title}
+                    width={500}
+                    height={750}
+                    className="w-full h-auto"
+                  />
+                </Link>
+                <div className="p-4">
+                  <h2 className="text-xl font-semibold text-center">{movie.title}</h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    <strong>Overview:</strong> {movie.overview}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    <strong>Release Date:</strong>{" "}
+                    {new Date(movie.release_date).toLocaleDateString()}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    <strong>Rating:</strong> {movie.rating}/10
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    <strong>Genres:</strong> {movie.genres.join(", ")}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteFavorite(movie.id)}
+                    className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-300"
+                  >
+                    Delete Favorite
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-600">No favorite movies added yet.</p>
+          )}
         </div>
       </div>
     </div>

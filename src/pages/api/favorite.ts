@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -12,12 +12,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Pastikan film favorit tersimpan untuk user yang spesifik
       const savedMovie = await prisma.movie.create({
         data: {
           title: movie.title,
           imageUrl: movie.imageUrl,
-          userId, // Kaitkan dengan userId dari pengguna yang login
+          overview: movie.overview || "",
+          release_date: movie.release_date ? new Date(movie.release_date) : null,
+          rating: movie.rating || 0,
+          genres: movie.genres || [],
+          userId,
         },
       });
       res.status(200).json(savedMovie);
@@ -33,9 +36,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Ambil daftar favorit hanya untuk pengguna yang login
       const favoriteMovies = await prisma.movie.findMany({
         where: { userId: userId as string },
+        select: {
+          id: true,
+          title: true,
+          imageUrl: true,
+          overview: true,
+          release_date: true,
+          rating: true,
+          genres: true,
+        },
       });
 
       res.status(200).json(favoriteMovies);
@@ -46,11 +57,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if (method === "DELETE") {
     const { movieId } = req.body;
 
+    if (!movieId) {
+      return res.status(400).json({ error: "MovieId is required" });
+    }
+
     try {
       await prisma.movie.delete({
-        where: {
-          id: movieId,
-        },
+        where: { id: movieId },
       });
       res.status(200).json({ message: "Movie deleted successfully" });
     } catch (error) {

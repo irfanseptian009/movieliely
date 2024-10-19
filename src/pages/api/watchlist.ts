@@ -12,16 +12,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Menyimpan film ke watchlist berdasarkan userId
-      const savedMovie = await prisma.watchlist.create({
+      // Save movie to the user's watchlist
+      const savedWatchlistItem = await prisma.watchlist.create({
         data: {
+          userId,
+          movieId: movie.id,
           title: movie.title,
           imageUrl: movie.imageUrl,
-          userId, // Kaitkan dengan userId dari pengguna yang login
-          movieId: movie.id.toString(), // Pastikan movieId disimpan sebagai string
         },
       });
-      res.status(200).json(savedMovie);
+      res.status(200).json(savedWatchlistItem);
     } catch (error) {
       console.error("Error saving movie to watchlist:", error);
       res.status(500).json({ error: "Failed to save movie to watchlist" });
@@ -34,34 +34,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Mengambil daftar watchlist berdasarkan userId
+      // Get watchlist for the user
       const watchlistMovies = await prisma.watchlist.findMany({
         where: { userId: userId as string },
       });
 
       res.status(200).json(watchlistMovies);
     } catch (error) {
-      console.error("Error fetching watchlist movies:", error);
-      res.status(500).json({ error: "Failed to fetch watchlist movies" });
+      console.error("Error fetching watchlist:", error);
+      res.status(500).json({ error: "Failed to fetch watchlist" });
     }
   } else if (method === "DELETE") {
-    const { movieId } = req.body;
-
-    if (!movieId) {
-      return res.status(400).json({ error: "MovieId is required" });
-    }
+    const { movieId, userId } = req.body;
 
     try {
-      // Menghapus film dari watchlist berdasarkan movieId
-      await prisma.watchlist.delete({
+      await prisma.watchlist.deleteMany({
         where: {
-          id: movieId, // Menghapus berdasarkan id dari tabel watchlist
+          userId: userId,
+          movieId: movieId,
         },
       });
-      res.status(200).json({ message: "Movie deleted from watchlist successfully" });
+      res.status(200).json({ message: "Movie removed from watchlist" });
     } catch (error) {
-      console.error("Error deleting movie from watchlist:", error);
-      res.status(500).json({ error: "Failed to delete movie from watchlist" });
+      console.error("Error removing movie from watchlist:", error);
+      res.status(500).json({ error: "Failed to remove movie from watchlist" });
     }
   } else {
     res.setHeader("Allow", ["POST", "GET", "DELETE"]);

@@ -11,23 +11,40 @@ model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
-  favorites Movie[]  
-  Watchlist Watchlist[]
+  favorites Movie[] 
+  watchlist Watchlist[] 
+  reviews   Review[]  
 }
 
 model Movie {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  imageUrl  String
-  userId    String   @db.ObjectId 
-  user      User     @relation(fields: [userId], references: [id])
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  imageUrl     String
+  overview     String?  
+  release_date DateTime? 
+  rating       Float?  
+  genres       String[] 
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model Watchlist {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId   String   @db.ObjectId 
-  movieId  String  
-  title    String
-  imageUrl String
-  user      User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId  
+  movieId   String   @db.ObjectId  
+  title     String
+  imageUrl  String
+  user      User     @relation(fields: [userId], references: [id])  
+  reviews   Review[] 
+}
+
+model Review {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId 
+  watchlistId String  @db.ObjectId  
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id]) 
+  watchlist  Watchlist @relation(fields: [watchlistId], references: [id]) 
 }
