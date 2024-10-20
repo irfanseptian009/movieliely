@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Cookies from "js-cookie";
 import Image from "next/image";
@@ -76,7 +77,7 @@ const WatchlistPage = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 bg-gray-950  min-h-screen">
         <h1 className="text-2xl font-bold mb-6">Your Watchlist</h1>
         {watchlist.length > 0 ? (
           <div className="grid grid-cols-3 gap-6">
@@ -90,13 +91,12 @@ const WatchlistPage = () => {
                     height={750}
                     className="w-full h-auto"
                   />
+                  <h2 className="text-lg font-bold mb-2">{movie.title}</h2>
+                  <p className="text-gray-400 mb-4">{movie.overview}</p>
+                  <p className="text-gray-400 mb-4">
+                    Rating: {movie.rating?.toFixed(1) || "N/A"}
+                  </p>{" "}
                 </Link>
-
-                <h2 className="text-lg font-bold mb-2">{movie.title}</h2>
-                <p className="text-gray-400 mb-4">{movie.overview}</p>
-                <p className="text-gray-400 mb-4">
-                  Rating: {movie.rating?.toFixed(1) || "N/A"}
-                </p>
                 <button
                   className="bg-red-500 text-white py-2 px-4 rounded"
                   onClick={() => handleDelete(movie.id)}
@@ -108,8 +108,9 @@ const WatchlistPage = () => {
           </div>
         ) : (
           <p className="text-gray-400">Your watchlist is empty.</p>
-        )}
+        )}{" "}
       </div>
+      <Footer />
     </>
   );
 };

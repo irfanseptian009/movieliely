@@ -1,14 +1,22 @@
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { useState } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = () => {
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const handleLogout = () => {
-    Cookies.remove("userId"); // Hapus userId dari cookie saat logout
-    window.location.href = "/login"; // Redirect ke halaman login
+    Cookies.remove("userId");
+    window.location.href = "/login";
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
-    <nav className="bg-gray-900 p-4 shadow-md">
+    <nav className="bg-gray-900 p-4 shadow-md w-full z-50">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo / Brand */}
         <div className="text-white text-2xl font-bold">
@@ -19,8 +27,8 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Navigation Links */}
-        <div className="flex space-x-6 text-white">
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex space-x-6 text-white">
           <Link href="/movie">
             <span className="hover:text-yellow-400 transition-colors duration-300 cursor-pointer">
               Movies
@@ -39,7 +47,6 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-300"
@@ -47,6 +54,55 @@ const Navbar = () => {
             Logout
           </button>
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden text-white text-2xl">
+          <button onClick={toggleMobileMenu}>
+            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="absolute top-0 left-0 w-full h-screen bg-gray-900 text-white flex flex-col items-center justify-center space-y-6 z-40">
+            <Link href="/movie">
+              <span
+                className="hover:text-yellow-400 text-xl transition-colors duration-300 cursor-pointer"
+                onClick={toggleMobileMenu}
+              >
+                Movies
+              </span>
+            </Link>
+
+            <Link href="/watchlist">
+              <span
+                className="hover:text-yellow-400 text-xl transition-colors duration-300 cursor-pointer"
+                onClick={toggleMobileMenu}
+              >
+                Watchlist
+              </span>
+            </Link>
+
+            <Link href="/profile">
+              <span
+                className="hover:text-yellow-400 text-xl transition-colors duration-300 cursor-pointer"
+                onClick={toggleMobileMenu}
+              >
+                Profile
+              </span>
+            </Link>
+
+            <button
+              onClick={() => {
+                handleLogout();
+                toggleMobileMenu();
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-300"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

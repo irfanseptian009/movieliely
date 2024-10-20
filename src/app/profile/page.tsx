@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Cookies from "js-cookie";
 import Image from "next/image";
@@ -22,7 +23,7 @@ const ProfilePage = () => {
   const [favorites, setFavorites] = useState<Movie[]>([]);
 
   useEffect(() => {
-    const userId = Cookies.get("userId"); // Get userId from cookie
+    const userId = Cookies.get("userId");
 
     if (userId) {
       fetch(`/api/favorite?userId=${userId}`)
@@ -63,56 +64,62 @@ const ProfilePage = () => {
   };
 
   return (
-    <div>
+    <>
       <Navbar />
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-8 text-center">Your Favorite Movies</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {favorites.length > 0 ? (
-            favorites.map((movie) => (
-              <div
-                key={movie.id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <Link href={`/movie/${movie.movieId}`}>
-                  <Image
-                    src={movie.imageUrl}
-                    alt={movie.title}
-                    width={500}
-                    height={750}
-                    className="w-full h-auto"
-                  />
-                </Link>
-                <div className="p-4">
-                  <h2 className="text-xl font-semibold text-center">{movie.title}</h2>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <strong>Overview:</strong> {movie.overview}
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <strong>Release Date:</strong>{" "}
-                    {new Date(movie.release_date).toLocaleDateString()}
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <strong>Rating:</strong> {movie.rating}/10
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <strong>Genres:</strong> {movie.genres.join(", ")}
-                  </p>
+      <div className="bg-gray-950 text-white min-h-screen">
+        <div className="container mx-auto p-4">
+          <h1 className="text-4xl font-bold mb-8 text-center">Your Favorite Movies</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {favorites.length > 0 ? (
+              favorites.map((movie) => (
+                <div
+                  key={movie.id}
+                  className="bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-red-500/50 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+                >
+                  <Link href={`/movie/${movie.movieId}`}>
+                    <Image
+                      src={movie.imageUrl}
+                      alt={movie.title}
+                      width={500}
+                      height={750}
+                      className="w-full h-auto"
+                    />
+
+                    <div className="p-4">
+                      <h2 className="text-2xl font-semibold text-center">
+                        {movie.title}
+                      </h2>
+                      <p className="mt-4 text-sm text-gray-300">
+                        <strong>Overview:</strong> {movie.overview}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-300">
+                        <strong>Release Date:</strong>{" "}
+                        {new Date(movie.release_date).toLocaleDateString()}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-300">
+                        <strong>Rating:</strong> {movie.rating}/10
+                      </p>
+                      <p className="mt-2 text-sm text-gray-300">
+                        <strong>Genres:</strong> {movie.genres.join(", ")}
+                      </p>
+                    </div>
+                  </Link>
                   <button
                     onClick={() => handleDeleteFavorite(movie.id)}
-                    className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-300"
+                    className="mt-4 m-5 bg-red-600 text-white p-3 rounded-lg shadow hover:bg-red-700 hover:shadow-lg transition-all duration-300"
                   >
                     Delete Favorite
                   </button>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-center text-gray-600">No favorite movies added yet.</p>
-          )}
+              ))
+            ) : (
+              <p className="text-center text-gray-400">No favorite movies added yet.</p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
