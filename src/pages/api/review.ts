@@ -1,71 +1,67 @@
-import prisma from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
+import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
+// Initialize Prisma Client
+const prisma = new PrismaClient();
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req;
+  if (req.method === "POST") {
+    const { userId, movie } = req.body;
 
-  if (method === "POST") {
-    const { userId, watchlistId, rating, comment } = req.body;
-
-    // Validasi input
-    if (!userId || !watchlistId || !rating || !comment) {
-      return res.status(400).json({ error: "Missing required fields" });
+    // Validate incoming data
+    if (!userId || !ObjectId.isValid(userId) || !movie || !movie.id) {
+      return res.status(400).json({ message: "Invalid userId or movie data" });
     }
 
     try {
-      // Simpan review baru ke database
-      const newReview = await prisma.review.create({
+      // Convert userId to ObjectId
+      const userObjectId = new ObjectId(userId);
+
+      // Check if the user exists
+      const user = await prisma.user.findUnique({
+        where: { id: userObjectId.toString() },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if the movie is already in the watchlist
+      const existingWatchlistItem = await prisma.watchlist.findFirst({
+        where: {
+          movieId: movie.id, // movie.id is treated as a string
+          userId: userObjectId.toString(), // Ensure userId is properly formatted
+        },
+      });
+
+      if (existingWatchlistItem) {
+        return res.status(400).json({ message: "Movie already in watchlist" });
+      }
+
+      // Add movie to the watchlist
+      const newWatchlistItem = await prisma.watchlist.create({
         data: {
-          userId,
-          watchlistId,
-          rating: parseInt(rating, 10),
-          comment,
+          movieId: movie.id, // movie.id as a string
+          title: movie.title,
+          imageUrl: movie.imageUrl,
+          overview: movie.overview,
+          release_date: movie.release_date ? new Date(movie.release_date) : null,
+          rating: movie.rating || 0,
+          genres: movie.genres,
+          userId: userObjectId.toString(), // Convert userId to string to store it properly
         },
       });
-      res.status(200).json(newReview);
+
+      res
+        .status(200)
+        .json({ message: "Movie added to watchlist", watchlistItem: newWatchlistItem });
     } catch (error) {
-      console.error("Error adding review:", error);
-      res.status(500).json({ error: "Failed to add review" });
-    }
-  } else if (method === "GET") {
-    const { watchlistId } = req.query;
-
-    if (!watchlistId) {
-      return res.status(400).json({ error: "WatchlistId is required" });
-    }
-
-    try {
-      const reviews = await prisma.review.findMany({
-        where: { watchlistId: String(watchlistId) },
-        include: {
-          user: {
-            select: { email: true }, // Sertakan email user
-          },
-        },
-      });
-      res.status(200).json(reviews);
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-      res.status(500).json({ error: "Failed to fetch reviews" });
-    }
-  } else if (method === "DELETE") {
-    const { reviewId } = req.body;
-
-    if (!reviewId) {
-      return res.status(400).json({ error: "ReviewId is required" });
-    }
-
-    try {
-      await prisma.review.delete({
-        where: { id: String(reviewId) },
-      });
-      res.status(200).json({ message: "Review deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      res.status(500).json({ error: "Failed to delete review" });
+      console.error("Error adding movie to watchlist:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   } else {
-    res.setHeader("Allow", ["POST", "GET", "DELETE"]);
-    res.status(405).end(`Method ${method} Not Allowed`);
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} not allowed`);
   }
 }

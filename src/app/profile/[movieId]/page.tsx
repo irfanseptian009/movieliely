@@ -1,111 +1,93 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import Cookies from "js-cookie";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface Movie {
-  id: string;
-  title: string;
-  imageUrl: string;
-  overview: string;
-  release_date: string;
-  rating: number;
-  genres: string[];
-}
-
-const ProfilePage = () => {
-  const [favorites, setFavorites] = useState<Movie[]>([]);
+const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
+  const { movieId } = params;
+  const [movie, setMovie] = useState<MovieDetails | null>(null);
 
   useEffect(() => {
-    const userId = Cookies.get("userId");
-
-    if (userId) {
-      fetch(`/api/favorite?userId=${userId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setFavorites(data);
-        })
-        .catch((err) => console.error("Error fetching favorite movies:", err));
-    }
-  }, []);
-
-  const handleDeleteFavorite = async (movieId: string) => {
-    const response = await fetch("/api/favorite", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ movieId }),
-    });
-
-    if (response.ok) {
-      setFavorites((prevFavorites) =>
-        prevFavorites.filter((movie) => movie.id !== movieId)
+    const fetchMovieDetails = async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US`
       );
-    } else {
-      console.error("Failed to delete movie");
-    }
-  };
+      const data = await res.json();
+      setMovie(data);
+    };
+
+    fetchMovieDetails();
+  }, [movieId]);
+
+  if (!movie) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
       <Navbar />
-      <div className="container mx-auto">
-        <h1 className="text-2xl font-bold mt-4">Your Favorite Movies</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {favorites.length > 0 ? (
-            favorites.map((movie) => (
-              <div
-                key={movie.id}
-                className="bg-white shadow-md rounded-lg p-4 transition duration-300 hover:shadow-lg"
-              >
-                <Link href={`/movie/${movie.id}`}>
-                  <Image
-                    src={movie.imageUrl}
-                    alt={movie.title}
-                    width={500}
-                    height={750}
-                    className="rounded-lg"
-                  />
-                </Link>
-                <Link href={`/movie/${movie.id}`}>
-                  <h2 className="text-lg font-semibold text-center mt-2">
-                    {movie.title}
-                  </h2>
-                </Link>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Overview:</strong> {movie.overview}
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Release Date:</strong>{" "}
-                  {new Date(movie.release_date).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Rating:</strong> {movie.rating}/10
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Genres:</strong> {movie.genres.join(", ")}
-                </p>
-                <button
-                  onClick={() => handleDeleteFavorite(movie.id)}
-                  className="mt-2 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-300"
-                >
-                  Delete Favorite
-                </button>
-              </div>
-            ))
-          ) : (
-            <p className="text-center mt-4 text-gray-600">
-              No favorite movies added yet.
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col lg:flex-row">
+          <div className="lg:w-1/3">
+            <Image
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={movie.title}
+              width={500}
+              height={750}
+              className="rounded-lg"
+            />
+          </div>
+          <div className="lg:w-2/3 lg:pl-8">
+            <h1 className="text-3xl font-bold">{movie.title}</h1>
+            <p className="mt-4 text-gray-600">{movie.overview}</p>
+            <p className="mt-4">
+              <strong>Release Date:</strong> {movie.release_date}
             </p>
-          )}
+            <p className="mt-2">
+              <strong>Rating:</strong> {movie.vote_average} / 10
+            </p>
+            <p className="mt-2">
+              <strong>Runtime:</strong> {movie.runtime} minutes
+            </p>
+            <p className="mt-2">
+              <strong>Genres:</strong>{" "}
+              {movie.genres && movie.genres.length > 0
+                ? movie.genres.map((genre: { name: string }) => genre.name).join(", ")
+                : "N/A"}
+            </p>
+            <p className="mt-2">
+              <strong>Original Language:</strong> {movie.original_language}
+            </p>
+            <p className="mt-2">
+              <strong>Production Companies:</strong>{" "}
+              {movie.production_companies && movie.production_companies.length > 0
+                ? movie.production_companies
+                    .map((company: { name: string }) => company.name)
+                    .join(", ")
+                : "N/A"}
+            </p>
+            <p className="mt-2">
+              <strong>Tagline:</strong> {movie.tagline || "N/A"}
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+interface MovieDetails {
+  poster_path: string;
+  title: string;
+  overview: string;
+  release_date: string;
+  vote_average: number;
+  runtime: number;
+  genres: Array<{ name: string }>;
+  original_language: string;
+  production_companies: Array<{ name: string }>;
+  tagline: string;
+}
+
+export default MovieDetailPage;

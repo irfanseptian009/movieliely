@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface Movie {
   id: string;
@@ -14,13 +15,14 @@ interface Movie {
   release_date: string;
   rating: number;
   genres: string[];
+  movieId: string;
 }
 
 const ProfilePage = () => {
   const [favorites, setFavorites] = useState<Movie[]>([]);
 
   useEffect(() => {
-    const userId = Cookies.get("userId"); // Ambil userId dari cookie
+    const userId = Cookies.get("userId"); // Get userId from cookie
 
     if (userId) {
       fetch(`/api/favorite?userId=${userId}`)
@@ -28,25 +30,35 @@ const ProfilePage = () => {
         .then((data) => {
           setFavorites(data);
         })
-        .catch((err) => console.error("Error fetching favorite movies:", err));
+        .catch((err) => {
+          console.error("Error fetching favorite movies:", err);
+          toast.error("Failed to load favorite movies");
+        });
+    } else {
+      toast.error("User not logged in");
     }
   }, []);
 
   const handleDeleteFavorite = async (movieId: string) => {
-    const response = await fetch("/api/favorite", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ movieId }),
-    });
+    try {
+      const response = await fetch("/api/favorite", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ movieId }),
+      });
 
-    if (response.ok) {
-      setFavorites((prevFavorites) =>
-        prevFavorites.filter((movie) => movie.id !== movieId)
-      );
-    } else {
-      console.error("Failed to delete movie");
+      if (response.ok) {
+        const updatedFavorites = favorites.filter((movie) => movie.id !== movieId);
+        setFavorites(updatedFavorites);
+        toast.success("Favorite movie deleted successfully");
+      } else {
+        toast.error("Failed to delete favorite movie");
+      }
+    } catch (error) {
+      console.error("Error deleting favorite:", error);
+      toast.error("Error deleting favorite movie");
     }
   };
 
@@ -62,7 +74,7 @@ const ProfilePage = () => {
                 key={movie.id}
                 className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
-                <Link href={`/movie/${movie.id}`}>
+                <Link href={`/movie/${movie.movieId}`}>
                   <Image
                     src={movie.imageUrl}
                     alt={movie.title}

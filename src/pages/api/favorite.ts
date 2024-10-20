@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           rating: movie.rating || 0,
           genres: movie.genres || [],
           userId,
+          movieId: movie.id,
         },
       });
       res.status(200).json(savedMovie);
@@ -46,6 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           release_date: true,
           rating: true,
           genres: true,
+          movieId: true,
         },
       });
 
