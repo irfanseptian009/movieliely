@@ -30,10 +30,14 @@ model Movie {
 
 model Watchlist {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+   title        String
+  imageUrl     String
+  overview     String?  
+  release_date DateTime? 
+  rating       Float?  
+  genres       String[] 
   userId    String   @db.ObjectId  
   movieId   String   @db.ObjectId  
-  title     String
-  imageUrl  String
   user      User     @relation(fields: [userId], references: [id])  
   reviews   Review[] 
 }

@@ -12,11 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Save movie to the user's watchlist
+      // Simpan film ke watchlist pengguna
       const savedWatchlistItem = await prisma.watchlist.create({
         data: {
           userId,
-          movieId: movie.id,
+          movieId: movie.id, // pastikan id film dalam bentuk string
           title: movie.title,
           imageUrl: movie.imageUrl,
         },
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Get watchlist for the user
+      // Ambil watchlist pengguna berdasarkan userId
       const watchlistMovies = await prisma.watchlist.findMany({
         where: { userId: userId as string },
       });
@@ -48,6 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { movieId, userId } = req.body;
 
     try {
+      // Hapus film dari watchlist pengguna
       await prisma.watchlist.deleteMany({
         where: {
           userId: userId,

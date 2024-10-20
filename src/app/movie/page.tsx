@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import { toast } from "react-hot-toast";
 
 interface Movie {
   id: number;
@@ -25,7 +26,6 @@ const MoviePage = () => {
   const [page] = useState(1);
   const [, setTotalPages] = useState(1);
 
-  // Fetch movies and now playing on initial load
   useEffect(() => {
     const fetchMovies = async () => {
       const res = await fetch(
@@ -40,14 +40,13 @@ const MoviePage = () => {
         `https://api.themoviedb.org/3/movie/now_playing?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=1`
       );
       const data = await res.json();
-      setNowPlaying(data.results); // Store now playing movies
+      setNowPlaying(data.results);
     };
 
     fetchMovies();
     fetchNowPlaying();
-  }, [page]); // Fetch movies when page changes
+  }, [page]);
 
-  // Add to Favorite function
   const handleAddFavorite = async (movie: Movie) => {
     const newFavorite = {
       id: movie.id.toString(),
@@ -56,12 +55,10 @@ const MoviePage = () => {
       overview: movie.overview,
       release_date: movie.release_date,
       rating: movie.vote_average,
-      genres: movie.genres
-        ? movie.genres.map((genre) => genre.name) // Safeguard: Check if genres is defined
-        : [], // If undefined, set an empty array
+      genres: movie.genres ? movie.genres.map((genre) => genre.name) : [],
     };
 
-    const userId = Cookies.get("userId"); // Get userId from cookie
+    const userId = Cookies.get("userId");
 
     if (userId) {
       try {
@@ -77,23 +74,28 @@ const MoviePage = () => {
         });
 
         const data = await response.json();
-        if (!response.ok) {
-          console.error("Error saving favorite movie:", data);
+        if (response.ok) {
+          toast.success("Movie added to favorites!");
+        } else {
+          toast.error("Error adding movie to favorites: " + data.message);
         }
       } catch (error) {
-        console.error("Error saving favorite movie:", error);
+        if (error instanceof Error) {
+          toast.error("Error adding movie to favorites: " + error.message);
+        } else {
+          toast.error("An unknown error occurred while adding movie to favorites");
+        }
       }
     } else {
-      console.error("User not logged in");
+      toast.error("User not logged in");
     }
   };
 
-  // Add to Watchlist function
   const handleAddToWatchlist = async (movie: Movie) => {
     const userId = Cookies.get("userId");
 
     if (!userId) {
-      console.error("User not logged in");
+      toast.error("User not logged in");
       return;
     }
 
@@ -120,17 +122,19 @@ const MoviePage = () => {
       });
 
       if (response.ok) {
-        console.log("Movie added to watchlist");
+        toast.success("Movie added to watchlist!");
       } else {
         const data = await response.json();
-        console.error("Failed to add movie to watchlist:", data);
+        toast.error("Failed to add movie to watchlist: " + data.message);
       }
     } catch (error) {
-      console.error("Error adding movie to watchlist:", error);
+      if (error instanceof Error) {
+        toast.error("Error adding movie to watchlist: " + error.message);
+      } else {
+        toast.error("An unknown error occurred while adding movie to watchlist");
+      }
     }
   };
-
-  // Search movies by user input
   const handleSearch = async () => {
     if (searchTerm === "") {
       const res = await fetch(
