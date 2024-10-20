@@ -67,8 +67,10 @@ const ProfilePage = () => {
     <>
       <Navbar />
       <div className="bg-gray-950 text-white min-h-screen">
-        <div className="container mx-auto p-4">
-          <h1 className="text-4xl font-bold mb-8 text-center">Your Favorite Movies</h1>
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center">
+            Your Favorite Movies
+          </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {favorites.length > 0 ? (
               favorites.map((movie) => (
@@ -82,38 +84,40 @@ const ProfilePage = () => {
                       alt={movie.title}
                       width={500}
                       height={750}
-                      className="w-full h-auto"
+                      className="w-full h-auto rounded-lg"
                     />
 
                     <div className="p-4">
-                      <h2 className="text-2xl font-semibold text-center">
+                      <h2 className="text-xl font-semibold text-center sm:text-2xl">
                         {movie.title}
                       </h2>
-                      <p className="mt-4 text-sm text-gray-300">
+                      <p className="mt-4 text-sm text-gray-300 sm:text-base">
                         <strong>Overview:</strong> {movie.overview}
                       </p>
-                      <p className="mt-2 text-sm text-gray-300">
+                      <p className="mt-2 text-sm text-gray-300 sm:text-base">
                         <strong>Release Date:</strong>{" "}
                         {new Date(movie.release_date).toLocaleDateString()}
                       </p>
-                      <p className="mt-2 text-sm text-gray-300">
+                      <p className="mt-2 text-sm text-gray-300 sm:text-base">
                         <strong>Rating:</strong> {movie.rating}/10
                       </p>
-                      <p className="mt-2 text-sm text-gray-300">
+                      <p className="mt-2 text-sm text-gray-300 sm:text-base">
                         <strong>Genres:</strong> {movie.genres.join(", ")}
                       </p>
                     </div>
                   </Link>
                   <button
                     onClick={() => handleDeleteFavorite(movie.id)}
-                    className="mt-4 m-5 bg-red-600 text-white p-3 rounded-lg shadow hover:bg-red-700 hover:shadow-lg transition-all duration-300"
+                    className="mt-4 m-5 bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300 w-full"
                   >
                     Delete Favorite
                   </button>
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-400">No favorite movies added yet.</p>
+              <p className="text-center text-gray-400 text-lg">
+                No favorite movies added yet.
+              </p>
             )}
           </div>
         </div>

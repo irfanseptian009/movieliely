@@ -74,31 +74,34 @@ const WatchlistPage = () => {
       toast.error("Error deleting movie from watchlist");
     }
   };
+
   return (
     <>
       <Navbar />
-      <div className="container mx-auto py-8 bg-gray-950  min-h-screen">
-        <h1 className="text-2xl font-bold mb-6">Your Watchlist</h1>
+      <div className="container mx-auto py-8 px-4 bg-gray-950 text-white min-h-screen">
+        <h1 className="text-3xl font-bold mb-6 text-center">Your Watchlist</h1>
         {watchlist.length > 0 ? (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {watchlist.map((movie) => (
-              <div key={movie.id} className="bg-gray-800 p-4 rounded-lg">
+              <div key={movie.id} className="bg-gray-800 p-4 rounded-lg shadow-lg">
                 <Link href={`/watchlist/${movie.movieId}`}>
                   <Image
                     src={movie.imageUrl}
                     alt={movie.title}
                     width={500}
                     height={750}
-                    className="w-full h-auto"
+                    className="w-full h-auto rounded-lg mb-4"
                   />
-                  <h2 className="text-lg font-bold mb-2">{movie.title}</h2>
-                  <p className="text-gray-400 mb-4">{movie.overview}</p>
-                  <p className="text-gray-400 mb-4">
+                  <h2 className="text-lg sm:text-xl font-bold mb-2">{movie.title}</h2>
+                  <p className="text-gray-400 mb-4 text-sm sm:text-base">
+                    {movie.overview}
+                  </p>
+                  <p className="text-gray-400 mb-4 text-sm sm:text-base">
                     Rating: {movie.rating?.toFixed(1) || "N/A"}
-                  </p>{" "}
+                  </p>
                 </Link>
                 <button
-                  className="bg-red-500 text-white py-2 px-4 rounded"
+                  className="bg-red-500 text-white py-2 px-4 rounded w-full hover:bg-red-600 transition"
                   onClick={() => handleDelete(movie.id)}
                 >
                   Remove from Watchlist
@@ -107,8 +110,8 @@ const WatchlistPage = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-400">Your watchlist is empty.</p>
-        )}{" "}
+          <p className="text-gray-400 text-center text-lg">Your watchlist is empty.</p>
+        )}
       </div>
       <Footer />
     </>

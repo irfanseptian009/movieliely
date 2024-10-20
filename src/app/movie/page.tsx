@@ -266,9 +266,9 @@ const MoviePage = () => {
         )}
 
         <h1 className="text-3xl font-bold mt-8 mb-8">Now Playing</h1>
-        <div className="relative w-full ounded-3xl h-[60vh]">
+        <div className="relative w-100 ounded-3xl h-[70vh]">
           <Swiper
-            spaceBetween={10}
+            spaceBetween={0}
             slidesPerView={1}
             loop={true}
             autoplay={{
