@@ -39,7 +39,7 @@ const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
       <Navbar />
       <div className="bg-gray-950 text-white">
         <div className="container mx-auto p-4 sm:p-8">
-          <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-black rounded-lg shadow-lg p-4 sm:p-8">
+          <div className="bg-gradient-to-r from-red-500 via-red-950 to-black rounded-lg shadow-lg p-4 sm:p-8">
             <div className="flex flex-col lg:flex-row lg:space-x-8 items-center lg:items-start">
               {/* Movie Poster */}
               <div className="w-full lg:w-1/3 mb-6 lg:mb-0">
@@ -54,8 +54,12 @@ const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
 
               {/* Movie Details */}
               <div className="lg:w-2/3">
-                <h1 className="text-3xl sm:text-4xl font-bold text-lime-400 mb-4">{movie.title}</h1>
-                <p className="text-base sm:text-lg text-gray-400 mb-6">{movie.overview}</p>
+                <h1 className="text-3xl sm:text-4xl font-bold text-lime-400 mb-4">
+                  {movie.title}
+                </h1>
+                <p className="text-base sm:text-lg text-gray-400 mb-6">
+                  {movie.overview}
+                </p>
 
                 {/* Icons and details */}
                 <div className="space-y-4">
@@ -76,12 +80,14 @@ const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
 
                   <p className="flex items-center text-base sm:text-lg">
                     <FaFilm className="mr-2 text-green-400" />
-                    <strong>Genres:</strong> {movie.genres.map((genre) => genre.name).join(", ")}
+                    <strong>Genres:</strong>{" "}
+                    {movie.genres.map((genre) => genre.name).join(", ")}
                   </p>
 
                   <p className="flex items-center text-base sm:text-lg">
                     <FaLanguage className="mr-2 text-purple-400" />
-                    <strong>Original Language:</strong> {movie.original_language.toUpperCase()}
+                    <strong>Original Language:</strong>{" "}
+                    {movie.original_language.toUpperCase()}
                   </p>
 
                   <p className="flex items-center text-base sm:text-lg">
@@ -91,7 +97,8 @@ const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
 
                   <p className="flex items-center text-base sm:text-lg">
                     <FaFilm className="mr-2 text-red-500" />
-                    <strong>Production Companies:</strong> {movie.production_companies.map((company) => company.name).join(", ")}
+                    <strong>Production Companies:</strong>{" "}
+                    {movie.production_companies.map((company) => company.name).join(", ")}
                   </p>
 
                   <p className="flex items-center text-base sm:text-lg">
@@ -106,7 +113,8 @@ const MovieDetailPage = ({ params }: { params: { movieId: string } }) => {
                     <FaCalendarAlt className="mr-2 text-gray-300" /> {movie.release_date}
                   </p>
                   <p className="flex items-center">
-                    <FaFire className="mr-2 text-orange-400" /> Popularity: {movie.popularity}
+                    <FaFire className="mr-2 text-orange-400" /> Popularity:{" "}
+                    {movie.popularity}
                   </p>
                 </div>
               </div>

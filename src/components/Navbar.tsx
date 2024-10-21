@@ -43,7 +43,7 @@ const Navbar = () => {
 
           <Link href="/profile">
             <span className="hover:text-yellow-400 transition-colors duration-300 cursor-pointer">
-              Profile
+              favorite
             </span>
           </Link>
 
@@ -88,7 +88,7 @@ const Navbar = () => {
                 className="hover:text-yellow-400 text-xl transition-colors duration-300 cursor-pointer"
                 onClick={toggleMobileMenu}
               >
-                Profile
+                Favorite
               </span>
             </Link>
 
