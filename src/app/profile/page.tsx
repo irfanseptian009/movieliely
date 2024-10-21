@@ -91,9 +91,7 @@ const ProfilePage = () => {
                       <h2 className="text-xl font-semibold text-center sm:text-2xl">
                         {movie.title}
                       </h2>
-                      <p className="mt-4 text-sm text-gray-300 sm:text-base">
-                        <strong>Overview:</strong> {movie.overview}
-                      </p>
+
                       <p className="mt-2 text-sm text-gray-300 sm:text-base">
                         <strong>Release Date:</strong>{" "}
                         {new Date(movie.release_date).toLocaleDateString()}

@@ -96,9 +96,7 @@ const WatchlistPage = () => {
                     className="w-full h-auto rounded-lg mb-4"
                   />
                   <h2 className="text-lg sm:text-xl font-bold mb-2">{movie.title}</h2>
-                  <p className="text-gray-400 mb-4 text-sm sm:text-base">
-                    {movie.overview}
-                  </p>
+
                   <p className="text-gray-400 mb-4 text-sm sm:text-base">
                     Rating: {movie.rating?.toFixed(1) || "N/A"}
                   </p>
