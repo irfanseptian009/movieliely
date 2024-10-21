@@ -225,7 +225,10 @@ const MoviePage = () => {
             {movies.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {movies.map((movie: Movie) => (
-                  <div key={movie.id} className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                  <div
+                    key={movie.id}
+                    className="bg-gray-900 p-4 rounded-lg shadow-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+                  >
                     <Link href={`/movie/${movie.id}`}>
                       <Image
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -272,14 +275,14 @@ const MoviePage = () => {
             slidesPerView={1}
             loop={true}
             autoplay={{
-              delay: 3000,
-              disableOnInteraction: true,
+              delay: 2000,
+              disableOnInteraction: false,
             }}
             effect="fade"
             fadeEffect={{ crossFade: true }}
-            navigation
+            navigation={true}
             modules={[Autoplay, EffectFade, Navigation]}
-            className="h-full ounded-3xl"
+            className="h-full rounded-3xl"
           >
             {nowPlaying.map((movie: Movie) => (
               <SwiperSlide key={movie.id}>
@@ -311,7 +314,10 @@ const MoviePage = () => {
         <h1 className="text-3xl text-center font-bold mt-8 mb-8">Popular Movies</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-44">
           {popularMovies.map((movie: Movie) => (
-            <div key={movie.id} className="bg-gray-900 p-4 rounded-lg shadow-lg">
+            <div
+              key={movie.id}
+              className="bg-gray-900 p-4 rounded-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105 shadow-lg"
+            >
               <Link href={`/movie/${movie.id}`}>
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -345,7 +351,10 @@ const MoviePage = () => {
         <h1 className="text-3xl text-center font-bold mt-8 mb-8">Upcoming Movies</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-40">
           {upcomingMovies.map((movie: Movie) => (
-            <div key={movie.id} className="bg-gray-900 p-4 rounded-lg shadow-lg">
+            <div
+              key={movie.id}
+              className="bg-gray-900 p-4 rounded-lg shadow-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+            >
               <Link href={`/movie/${movie.id}`}>
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -379,7 +388,10 @@ const MoviePage = () => {
         <h1 className="text-3xl text-center font-bold mt-8 mb-8">Top Rated Movies</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-40">
           {topRatedMovies.map((movie: Movie) => (
-            <div key={movie.id} className="bg-gray-900 p-4 rounded-lg shadow-lg">
+            <div
+              key={movie.id}
+              className="bg-gray-900 p-4 rounded-lg shadow-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+            >
               <Link href={`/movie/${movie.id}`}>
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

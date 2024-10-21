@@ -83,7 +83,10 @@ const WatchlistPage = () => {
         {watchlist.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {watchlist.map((movie) => (
-              <div key={movie.id} className="bg-gray-800 p-4 rounded-lg shadow-lg">
+              <div
+                key={movie.id}
+                className="bg-gray-800 p-4 rounded-lg shadow-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+              >
                 <Link href={`/watchlist/${movie.movieId}`}>
                   <Image
                     src={movie.imageUrl}

@@ -76,7 +76,7 @@ const ProfilePage = () => {
               favorites.map((movie) => (
                 <div
                   key={movie.id}
-                  className="bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-red-500/50 transition-shadow duration-500 ease-in-out transform hover:scale-105"
+                  className="bg-gray-800 shadow-md rounded-lg overflow-hidden hover:shadow-red-500/100 transition-shadow duration-500 ease-in-out transform hover:scale-105"
                 >
                   <Link href={`/movie/${movie.movieId}`}>
                     <Image
@@ -108,7 +108,7 @@ const ProfilePage = () => {
                   </Link>
                   <button
                     onClick={() => handleDeleteFavorite(movie.id)}
-                    className="mt-4 m-5 bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300 w-full"
+                    className="mt-4 mb-3  bg-red-600 text-white p-3 rounded-xl shadow-lg hover:bg-red-700 transition-all duration-300 w-full"
                   >
                     Delete Favorite
                   </button>
