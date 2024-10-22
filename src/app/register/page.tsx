@@ -29,9 +29,9 @@ const RegisterPage = () => {
 
     if (res.ok) {
       const data = await res.json();
-      Cookies.set("userId", data.userId); // Save userId in cookie after registration
+      Cookies.set("userId", data.userId);
       toast.success("Registration successful!");
-      router.push("/movie"); // Redirect to movie page after successful registration
+      router.push("/login");
     } else {
       const data = await res.json();
       setError(data.message || "Registration failed");
